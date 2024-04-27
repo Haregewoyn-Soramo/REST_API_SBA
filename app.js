@@ -63,23 +63,28 @@ app.get('/register', (req, res) => {
 
 app.post('/register', async function (req, res) {
   try {
-    const newUser =[];
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    newUser.push({
+    const user = userData.find(user =>user.Email == req.body.email)
+    if(user){
+      res.redirect('/home')
+      return;
+    }
+      const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
+      const newUser = {
       id: Date.now().toString(),
       firstName: req.body.firstName,
-      middleName: req.body.middleName,
       lastName: req.body.lastName,
       email: req.body.email,
       password: hashedPassword,
-      confirmPassword: hashedPassword
-    });
+    };
+    userData.push(newUser)
     console.log(newUser);
+
     res.redirect('/book'); 
-  } catch {
+   } catch(error) {
+    console.log(error)
     res.redirect('/home');
-  }
-});
+   }
+  });
 
   app.get('/book', (req, res) => {
   res.render('book.ejs', { collectionOfbooks: collectionOfbooks });
