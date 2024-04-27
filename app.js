@@ -13,11 +13,28 @@ const saltRounds = 10;
 app.use(express.static('./public'))
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(requestLogger);
 
 app.use(express.static(path.join(__dirname,'public')));
 
 app.set('view engine', 'ejs');
 // app.use(express.urlencoded({  extended: false }));
+
+function checkEmptyBody(req, res, next) {
+  if (Object.keys(req.body).length === 0) {
+    return res.status(400).send('Request body cannot be empty');
+  }
+  next();
+}
+
+app.post('/api/users', checkEmptyBody, (req, res) => {
+  res.send('User created successfully');
+});
+
+app.post('/api/posts', checkEmptyBody, (req, res) => {
+  res.send('This route should never be reached');
+});
+
 
 app.get('/home', (req, res) => {
   res.render('home.ejs');
@@ -147,7 +164,10 @@ app.route('/api/book/:title')
     }
   });
 
-
+  function requestLogger(req, res, next) {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+  }
 
 app.listen(port, () => {
   console.log('Server is running on port', port);
