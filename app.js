@@ -112,41 +112,40 @@ app.post('/add', function(req, res) {
   }
 });
 
- app
-.route('/api/book/:title')
-.get( (req, res, next) => {
-  const book = collectionOfbooks.find((book) => book.title == req.params.title);
-  if (book) res.json(book);
-  else next();
- })
-
- .patch((req, res, next) =>{
-  const book = collectionOfbooks.find((book, inx) =>{
-    if(book.title == req.params.title){
-      for(const key in req.body){
-        book[inx][key] = req.body[key]
-      }
-      return true;
+app.route('/api/book/:title')
+  .get((req, res, next) => {
+    const book = collectionOfbooks.find((book) => book.title === req.params.title);
+    if (book) {
+      res.json(book);
+    } else {
+      res.status(404).json({ error: 'Book not found' });
     }
   })
-  if(book)
-  res.json(book);
-  next()
- })
-  .delete((req, res, next) =>{
-    const book = collectionOfbooks.find((book, inx) =>{
-      if(book.title == req.params.title){
-        collectionOfbooks.splice(inx, 1);
-        return true;
+
+ .patch((req, res, next) => {
+  const bookIndex = collectionOfbooks.findIndex((book) => book.title === req.params.title);
+  if (bookIndex !== -1) {
+    const bookToUpdate = collectionOfbooks[bookIndex];
+    for (const key in req.body) {
+      if (Object.hasOwnProperty.call(req.body, key)) {
+        bookToUpdate[key] = req.body[key];
       }
-    })
-    if(book) res.json(post);
-    else next();
+    }
+    collectionOfbooks[bookIndex] = bookToUpdate;
+    res.json(bookToUpdate);
+  } else {
+    res.status(404).json({ error: 'Book not found' });
+  }
+})
+   .delete((req, res, next) => {
+    const bookIndex = collectionOfbooks.findIndex((book) => book.title === req.params.title);
+    if (bookIndex !== -1) {
+      const deletedBook = collectionOfbooks.splice(bookIndex, 1)[0];
+      res.json(deletedBook);
+    } else {
+      res.status(404).json({ error: 'Book not found' });
+    }
   });
-
-
-
-
 
 
 
