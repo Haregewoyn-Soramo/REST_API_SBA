@@ -20,6 +20,13 @@ app.use(express.static(path.join(__dirname,'public')));
 app.set('view engine', 'ejs');
 // app.use(express.urlencoded({  extended: false }));
 
+const errorHandler = (err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something went wrong!'); 
+};
+
+app.use(errorHandler);
+
 function checkEmptyBody(req, res, next) {
   if (Object.keys(req.body).length === 0) {
     return res.status(400).send('Request body cannot be empty');
