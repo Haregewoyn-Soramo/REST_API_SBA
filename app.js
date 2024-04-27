@@ -1,14 +1,14 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
 const ejs = require('ejs');
 const path = require('path');
 const app = express();
 const port = 3000;
 const bodyParser = require('body-parser');
 const collectionOfbooks = require('./book-collection/collections.js')
+const userData = require('./book-collection/users.js')
 
-const users = [];
-const books = [];
+// const users = [];
+// const books = [];
 
 app.use(express.static('./public'))
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -22,26 +22,17 @@ app.set('view engine', 'ejs');
 app.get('/home', (req, res) => {
   res.render('home.ejs');
 });
-
+app.get('/api/user/:id',function(req, res){
+  const users = userData.find(user => user.id = req.params.id );
+  res.json(users);
+})
 app.get('/login', (req, res) => {
   res.render('login.ejs');
 });
 
-app.post('/login', async function (req, res) {
-  try {
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    users.push({
-      username: req.body.username,
-      email: req.body.email,
-      password: hashedPassword
-    });
-    console.log(users);
-    res.redirect('/book'); 
-  } catch {
-    res.redirect('/home');
-  }
-});
-
+app.post('/login', function(req, res){
+    
+})
 app.get('/register', (req, res) => { 
   res.render('register.ejs'); 
 });
@@ -67,8 +58,14 @@ app.post('/register', async function (req, res) {
   }
 });
 
-app.get('/book', function(req, res){
-  res.render('book.ejs', { collectionOfbooks: collectionOfbooks }); 
+  app.get('/book', (req, res) => {
+  res.render('book.ejs', { collectionOfbooks: collectionOfbooks });
+  });
+
+
+app.get('/api/book/:title', (req, res) => {
+  const book = collectionOfbooks.find((book) => book.title == req.params.title);
+  if (book) res.json(book);
 });
 
 
@@ -96,15 +93,15 @@ app.post('/add', function(req, res) {
   }
 });
 
-function toggleZoom(card) {
-  card.classList.toggle('zoomed');
-}
+
+
+
+app.delete('/remove/:title', function(req, res){
+    
+})
 
 
 app.listen(port, () => {
   console.log('Server is running on port', port);
 });
 
-app.delete('/remove/:title', function(req, res){
-    
-})

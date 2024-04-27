@@ -1,37 +1,38 @@
 const users = [
   {
     "ID": 1,
-    "Username": "user1",
+    "password": "Test@123",
     "Email": "user1@example.com"
   },
   {
     "ID": 2,
-    "Username": "user2",
+    "password": "Test@123",
     "Email": "user2@example.com"
   },
   {
     "ID": 3,
-    "Username": "user3",
+    "password": "Test@123",
     "Email": "user3@example.com"
   },
   {
     "ID": 4,
-    "Username": "user4",
+    "password": "Test@123",
     "Email": "user4@example.com"
   },
   {
     "ID": 5,
-    "Username": "user5",
+    "password": "Test@123",
     "Email": "user5@example.com"
   },
   {
     "ID": 6,
-    "Username": "user6",
+    "password": "Test@123",
     "Email": "user6@example.com"
   },
   {
     "ID": 7,
-    "Username": "user7",
+    "password": "Test@123",
     "Email": "user7@example.com"
   },
 ]
+module.exports = users;
