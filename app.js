@@ -1,3 +1,4 @@
+require('events').EventEmitter.defaultMaxListeners = 15;
 const express = require('express');
 const ejs = require('ejs');
 const path = require('path');
@@ -8,9 +9,6 @@ const collectionOfbooks = require('./book-collection/collections.js')
 const userData = require('./book-collection/users.js')
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-
-// const users = [];
-// const books = [];
 
 app.use(express.static('./public'))
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -90,13 +88,6 @@ app.post('/register', async function (req, res) {
   res.render('book.ejs', { collectionOfbooks: collectionOfbooks });
   });
 
-
-app.get('/api/book/:title', (req, res) => {
-  const book = collectionOfbooks.find((book) => book.title == req.params.title);
-  if (book) res.json(book);
-});
-
-
 app.get('/add', (req, res) => {
   res.render('add.ejs');
 });
@@ -111,8 +102,8 @@ app.post('/add', function(req, res) {
       description: req.body.description,
       image: req.body.image
     };
-    books.push(newBook);
-    console.log(books);
+    collectionOfbooks.push(newBook);
+    console.log(collectionOfbooks); 
     res.redirect('/book');
     
   } catch (error) {
@@ -120,14 +111,43 @@ app.post('/add', function(req, res) {
     res.redirect('/home'); 
   }
 });
- 
+
+ app
+.route('/api/book/:title')
+.get( (req, res, next) => {
+  const book = collectionOfbooks.find((book) => book.title == req.params.title);
+  if (book) res.json(book);
+  else next();
+ })
+
+ .patch((req, res, next) =>{
+  const book = collectionOfbooks.find((book, inx) =>{
+    if(book.title == req.params.title){
+      for(const key in req.body){
+        book[inx][key] = req.body[key]
+      }
+      return true;
+    }
+  })
+  if(book)
+  res.json(book);
+  next()
+ })
+  .delete((req, res, next) =>{
+    const book = collectionOfbooks.find((book, inx) =>{
+      if(book.title == req.params.title){
+        collectionOfbooks.splice(inx, 1);
+        return true;
+      }
+    })
+    if(book) res.json(post);
+    else next();
+  });
 
 
 
 
-app.delete('/remove/:title', function(req, res){
-    
-})
+
 
 
 app.listen(port, () => {
