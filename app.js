@@ -6,6 +6,8 @@ const port = 3000;
 const bodyParser = require('body-parser');
 const collectionOfbooks = require('./book-collection/collections.js')
 const userData = require('./book-collection/users.js')
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 // const users = [];
 // const books = [];
@@ -30,9 +32,30 @@ app.get('/login', (req, res) => {
   res.render('login.ejs');
 });
 
-app.post('/login', function(req, res){
-    
-})
+async function hashedPassword(users){
+  for(user of users){
+    const hashedPassword = await bcrypt.hash(user.password, saltRounds) 
+    user.password = hashedPassword;
+  }
+}
+
+hashedPassword(userData);
+
+app.post('/login', async function(req, res){
+  const user = userData.find(user => user.Email == req.body.email);
+  if(user){
+    const passwordMatch = await bcrypt.compare(req.body.password, user.password);
+    if(passwordMatch){
+      res.redirect('/book');
+    } else {
+      
+      res.redirect('/home');
+    }
+  } else {
+    res.redirect('/home');
+  }
+});
+
 app.get('/register', (req, res) => { 
   res.render('register.ejs'); 
 });
@@ -92,6 +115,7 @@ app.post('/add', function(req, res) {
     res.redirect('/home'); 
   }
 });
+ 
 
 
 
